@@ -1,0 +1,55 @@
+<html>
+
+<head>
+    <title>Little Car</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+    <div style="margin:100px;">
+        <div class="jumbotron text-center">
+            <h1>Bienvenue</h1>
+            <p>Appuyez sur les touches dirrectionnel pour faire bouger la voiture !</p>
+        </div>
+    </div>
+</body>
+<script>
+    var keyPressed = [],
+        speed = 3,
+        allowedKeys = [38, 40, 37, 39, 109, 107];
+
+    function fetchAction() {
+        fetch('/actions', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ "pressed": keyPressed, "speed": speed })
+        });
+    }
+
+    document.addEventListener("keydown", function (event) {
+        if (!allowedKeys.includes(event.keyCode)) return;
+        if (speed > 1 && event.keyCode == 109) speed--;
+        if (speed < 3 && event.keyCode == 107) speed++;
+        if (!keyPressed.includes(event.keyCode)) {
+            keyPressed.push(event.keyCode);
+            fetchAction();
+        }
+    });
+
+    document.addEventListener("keyup", function (event) {
+        if (!allowedKeys.includes(event.keyCode)) return;
+        if (keyPressed.includes(event.keyCode)) {
+            keyPressed.splice(keyPressed.indexOf(event.keyCode), 1);
+            fetchAction();
+        }
+    });
+
+</script>
+
+</html>
